@@ -1,15 +1,15 @@
-
 import Image from 'next/image';
 
-export default function Home() {
+export default function Page() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-6 bg-gray-50">
-      <div className="mb-8">
+      <div className="mb-4">
         <Image
-          src="/logo.svg"
+          src="/logo.png"
           alt="IdzDoParku Logo"
           width={300}
           height={100}
+          className="mb-2" // Add margin to the bottom of the Image component
         />
       </div>
       <div className="grid gap-8 lg:grid-cols-2">
