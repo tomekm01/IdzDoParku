@@ -31,6 +31,12 @@ export default function Page() {
           >
             Rejestracja
           </a>
+          <a
+            href="/dashboard"
+            className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+          >
+            Dashboard
+          </a>
         </div>
       </div>
       <footer className="mt-8">

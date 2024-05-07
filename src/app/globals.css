@@ -16,6 +16,10 @@
   }
 }
 
+a {
+  color: rgb(49, 53, 250);
+}
+
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(

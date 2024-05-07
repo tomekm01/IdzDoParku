@@ -1,24 +1,22 @@
-export default function DashboardPage() {
+export default function POIListPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-6 bg-gray-50">
       <div className="grid gap-8 lg:grid-cols-2">
-        <div>
-          <h1 className="text-3xl font-bold mb-4">Witaj Username!</h1>
-        </div>
-        <div className="flex flex-col space-y-4 lg:justify-center items-center">
+        <h1>
+          Username
+        </h1>
+      </div>
+      <div>
+      <ol>
+          <li>
           <a
-            href="/poi_list"
-            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"
-          >
-            Lista POI
-          </a>
-          <a
-            href="/ranking"
+            href="/poi"
             className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"
           >
-            Ranking
+            POI 1
           </a>
-        </div>
+          </li>
+        </ol>
       </div>
       <footer className="mt-8">
         <p className="text-sm text-gray-500">
