@@ -48,7 +48,9 @@ export default function LoginPage() {
           className="w-full px-3 py-2 leading-tight focus:outline-none focus:shadow-outline border border-gray-300 rounded-md"
         />
       </div>
-      <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">Zaloguj się</button>
+      <div className="md:flex md:items-center md:justify-center">
+        <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">Zaloguj się</button>
+      </div>
     </form>
   </div>
   );
