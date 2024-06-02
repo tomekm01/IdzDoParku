@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Park, Achievement, User, POI, UserAchievement, LoginSession, QRScan, Comment
+from django.contrib.auth.hashers import make_password
 
 class ParkSerializer(serializers.ModelSerializer):
     class Meta:
@@ -15,6 +16,11 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
+        extra_kwargs = {'password_hash': {'write_only': True}}
+
+    def create(self, validated_data):
+        validated_data['password_hash'] = make_password(validated_data['password_hash'])
+        return super(UserSerializer, self).create(validated_data)
 
 class POISerializer(serializers.ModelSerializer):
     park = ParkSerializer()

@@ -16,7 +16,8 @@ Including another URLconf
 """
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from main.views import ParkViewSet, AchievementViewSet, UserViewSet, POIViewSet, UserAchievementViewSet, LoginSessionViewSet, QRScanViewSet, CommentViewSet
+from main.views import ParkViewSet, AchievementViewSet, UserViewSet, POIViewSet, UserAchievementViewSet, LoginSessionViewSet, QRScanViewSet, CommentViewSet, RegisterUserView
+from main.views import login_view
 
 router = DefaultRouter()
 router.register(r'parks', ParkViewSet)
@@ -30,4 +31,6 @@ router.register(r'comments', CommentViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),
+    path('api/register/', RegisterUserView.as_view(), name='register'),
+    path('api/login/', login_view, name='login'),
 ]

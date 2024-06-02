@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 
 class Park(models.Model):
@@ -14,8 +15,8 @@ class User(models.Model):
     username = models.CharField(max_length=100)
     password_hash = models.CharField(max_length=255)
     email = models.EmailField()
-    registration_date = models.DateField()
-    score = models.IntegerField()
+    registration_date = models.DateField(default=datetime.datetime.now().date())
+    score = models.IntegerField(default=0)
 
 class POI(models.Model):
     park = models.ForeignKey(Park, on_delete=models.CASCADE)

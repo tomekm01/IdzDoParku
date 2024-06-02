@@ -1,7 +1,9 @@
 'use client'
+import { useRouter } from 'next/navigation';
 import { useState } from "react";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -16,14 +18,28 @@ export default function LoginPage() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      // Perform login logic
-      console.log("Login credentials:", { username, password });
-      // Handle successful login
+      const response = await fetch("http://localhost:8000/api/login/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log("Login successful:", data);
+      router.push("/dashboard");
     } catch (error) {
-      // Handle login error
       console.error("Login error:", error);
     }
   };
+
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-6 bg-white">
