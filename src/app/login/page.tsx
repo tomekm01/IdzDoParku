@@ -33,7 +33,9 @@ export default function LoginPage() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
+
       console.log("Login successful:", data);
+      sessionStorage.setItem('session_id', data.session_id);
       router.push("/dashboard");
     } catch (error) {
       console.error("Login error:", error);

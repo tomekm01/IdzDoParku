@@ -17,7 +17,7 @@ Including another URLconf
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from main.views import ParkViewSet, AchievementViewSet, UserViewSet, POIViewSet, UserAchievementViewSet, LoginSessionViewSet, QRScanViewSet, CommentViewSet, RegisterUserView
-from main.views import login_view, check_qr_code, get_comments, add_comment
+from main.views import login_view, logout_view, get_user_info_view,get_user_achievements_view, check_qr_code, get_comments, add_comment
 
 router = DefaultRouter()
 router.register(r'parks', ParkViewSet)
@@ -33,6 +33,9 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('api/register/', RegisterUserView.as_view(), name='register'),
     path('api/login/', login_view, name='login'),
+    path('api/logout/', logout_view, name='logout'),
+    path('api/get_user_info/', get_user_info_view, name='get_user_info'),
+    path('api/get_user_achievements/', get_user_achievements_view, name='get_user_achievements'),
     path('api/pois/<int:poi_id>/check_qr_code/', check_qr_code, name='check_qr_code'),
     path('api/pois/<int:poi_id>/comments/', get_comments, name='get_comments'),
     path('api/pois/<int:poi_id>/add_comment/', add_comment, name='add_comment'),
