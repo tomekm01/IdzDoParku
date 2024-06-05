@@ -27,7 +27,7 @@ class POISerializer(serializers.ModelSerializer):
 
     class Meta:
         model = POI
-        fields = ('park', 'name', 'description', 'latitude', 'longitude', 'qr_code', 'additional_info_link', 'score_worth')
+        fields = '__all__'
 
 class UserAchievementSerializer(serializers.ModelSerializer):
     class Meta:
@@ -47,4 +47,5 @@ class QRScanSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = ['id', 'poi', 'user', 'content', 'comment_date']
+        read_only_fields = ['id', 'poi', 'user', 'comment_date']
