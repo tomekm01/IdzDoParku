@@ -35,7 +35,7 @@ class UserAchievement(models.Model):
 class LoginSession(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
+    end_date = models.DateTimeField(null=True)
 
 class QRScan(models.Model):
     poi = models.ForeignKey(POI, on_delete=models.CASCADE)

@@ -1,11 +1,12 @@
 # populate_db.py
 import os
 import django
+from django.contrib.auth.hashers import make_password
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'IdzDoParkuDjango.settings')
 django.setup()
 
-from main.models import Park, POI
+from main.models import Park, POI, Achievement, UserAchievement, User
 
 def populate():
     # Dodaj Park Południowy
@@ -25,6 +26,29 @@ def populate():
         qr_code="QR_CODE_LINK",
         additional_info_link="https://example.com",
         score_worth=10
+    )
+
+    first_ach = Achievement.objects.create(
+        name="Dobry początek!",
+        description="Gdzieś trzeba zacząć",
+        requirements="Zdobądź pierwszy POI"
+    )
+
+    Achievement.objects.create(
+        name="Pięć POI!",
+        description="Dobrze idzie",
+        requirements="Zdobądź 5 POI"
+    )
+
+    Agata = User.objects.create(
+        username="Agata",
+        password_hash=make_password("agataparks"),
+        email="agata@gmail.com"
+    )
+
+    UserAchievement.objects.create(
+        user=Agata,
+        achievement=first_ach
     )
 
 if __name__ == '__main__':

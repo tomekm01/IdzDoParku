@@ -3,6 +3,7 @@ from .models import Park, Achievement, User, POI, UserAchievement, LoginSession,
 from .serializers import ParkSerializer, AchievementSerializer, UserSerializer, POISerializer, UserAchievementSerializer, LoginSessionSerializer, QRScanSerializer, CommentSerializer
 from django.contrib.auth import login, logout
 from django.http import JsonResponse
+from django.core.serializers import serialize
 import datetime
 from django.contrib.auth.hashers import check_password
 from django.views.decorators.csrf import csrf_exempt
@@ -62,10 +63,82 @@ def login_view(request):
         if check_password(password, user.password_hash):
             #login(request, user)
             
-            login_session = LoginSession.objects.create(user=user, start_date=datetime.datetime.now(), end_date=datetime.datetime.now())
-            
+            login_session = LoginSession.objects.create(user=user, start_date=datetime.datetime.now())
+
             return JsonResponse({'message': 'Login successful', 'session_id': login_session.id})
         else:
             return JsonResponse({'message': 'Invalid username or password'}, status=400)
     else:
         return JsonResponse({'message': 'Invalid request method'}, status=405)
+    
+@csrf_exempt
+def logout_view(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            session_id = data.get('session_id')
+        except (json.JSONDecodeError, KeyError):
+            return JsonResponse({'message': 'Invalid JSON data'}, status=400)
+
+        try:
+            login_session = LoginSession.objects.get(id=session_id, end_date__isnull=True)
+            login_session.end_date = datetime.datetime.now()
+            login_session.save()
+            return JsonResponse({'message': 'Logout successful'})
+        except LoginSession.DoesNotExist:
+            return JsonResponse({'message': 'Invalid session ID'}, status=400)
+    else:
+        return JsonResponse({'message': 'Invalid request method'}, status=405)
+
+@csrf_exempt
+def get_user_info_view(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            session_id = data.get('session_id')
+        except (json.JSONDecodeError, KeyError):
+            return JsonResponse({'message': 'Invalid JSON data'}, status=400)
+        
+        try:
+            login_session = LoginSession.objects.get(id=session_id)
+            username = login_session.user.username
+            score = login_session.user.score
+            return JsonResponse({'message': 'Get user info successful', 'username': username, 'score': score})
+        except LoginSession.DoesNotExist:
+            return JsonResponse({'error': 'Session not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'message': 'Invalid request method'}, status=405)
+    
+@csrf_exempt
+def get_user_achievements_view(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            session_id = data.get('session_id')
+        except (json.JSONDecodeError, KeyError):
+            return JsonResponse({'message': 'Invalid JSON data'}, status=400)
+        
+        try:
+            login_session = LoginSession.objects.get(id=session_id)
+            users_ach = UserAchievement.objects.filter(user=login_session.user).select_related('achievement')
+            #users_ach = Achievement.objects.filter(id__in=users_ach_id).values()
+            achievements = [ua.achievement for ua in users_ach]
+            serialized_achievements = AchievementSerializer(achievements, many=True).data
+            #serialized_ach = serialize("json", users_ach)
+            #serialized_ach = json.loads(serialized_ach)
+            #all_ach = Achievement.objects.values()
+            #data = {}
+            #for e in all_ach:
+            #    if e.id not in users_ach_id:
+                    
+            return JsonResponse({'message': 'Get user achievements successful', 'serialized_achievements': serialized_achievements})
+        except LoginSession.DoesNotExist:
+            return JsonResponse({'error': 'Session not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'message': 'Invalid request method'}, status=405)
+    
+

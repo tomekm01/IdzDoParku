@@ -1,5 +1,3 @@
-// src/app/poi_list/page.tsx
-
 "use client";
 
 import { useEffect, useState } from "react";
