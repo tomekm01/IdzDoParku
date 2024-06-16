@@ -105,9 +105,10 @@ def get_user_info_view(request):
         
         try:
             login_session = LoginSession.objects.get(id=session_id)
+            user_id = login_session.user.pk
             username = login_session.user.username
             score = login_session.user.score
-            return JsonResponse({'message': 'Get user info successful', 'username': username, 'score': score})
+            return JsonResponse({'message': 'Get user info successful', 'user_id': user_id, 'username': username, 'score': score})
         except LoginSession.DoesNotExist:
             return JsonResponse({'error': 'Session not found'}, status=404)
         except Exception as e:
@@ -145,7 +146,27 @@ def get_user_achievements_view(request):
     else:
         return JsonResponse({'message': 'Invalid request method'}, status=405)
     
+@csrf_exempt
+def get_user_ranking(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            session_id = data.get('session_id')
+        except (json.JSONDecodeError, KeyError):
+            return JsonResponse({'message': 'Invalid JSON data'}, status=400)
+        
+        try:
+            #login_session = LoginSession.objects.get(id=session_id)
+            user_ranking = User.objects.all().order_by('-score').values()
+            serialized_ranking = UserSerializer(user_ranking, many=True).data
 
+            return JsonResponse({'message': 'Get user ranking successful', 'serialized_ranking': serialized_ranking})
+        except LoginSession.DoesNotExist:
+            return JsonResponse({'error': 'Session not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'message': 'Invalid request method'}, status=405)
 
 @csrf_exempt
 def check_qr_code(request, poi_id):

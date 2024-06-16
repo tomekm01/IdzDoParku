@@ -1,19 +1,19 @@
 export interface Park {
-  park_id: number;
+  id: number;
   park_name: string;
   location: string;
   description: string;
 }
 
 export interface Achievement {
-  achievement_id: number;
+  id: number;
   name: string;
   description: string;
   requirements: string;
 }
 
 export interface User {
-  user_id: number;
+  id: number;
   username: string;
   password_hash: string;
   email: string;
@@ -36,20 +36,20 @@ export interface POI {
 }
 
 export interface UserAchievement {
-  user_achievement_id: number;
+  id: number;
   user_id: number;
   achievement_id: number;
 }
 
 export interface LoginSession {
-  session_id: number;
+  id: number;
   user_id: number;
   start_date: Date;
   end_date: Date;
 }
 
 export interface QRScan {
-  scan_id: number;
+  id: number;
   poi_id: number;
   user_id: number;
   scan_date: Date;

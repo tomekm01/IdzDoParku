@@ -43,7 +43,8 @@ def populate():
     Agata = User.objects.create(
         username="Agata",
         password_hash=make_password("agataparks"),
-        email="agata@gmail.com"
+        email="agata@gmail.com",
+        score=10
     )
 
     UserAchievement.objects.create(

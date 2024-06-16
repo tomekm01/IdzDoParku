@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { POI, Achievement } from "../types/interfaces";
+import { Achievement } from "../types/interfaces";
 
 export default function AchievementsPage() {
   
@@ -47,7 +47,7 @@ export default function AchievementsPage() {
   const isUserAchievement = (achievementId: number) => {
     console.log("Checking Achievement ID:", achievementId);
     console.log("User Achievements:", userAchievements);
-    return Array.isArray(userAchievements) && userAchievements.some(ach => ach.achievement_id === achievementId);
+    return Array.isArray(userAchievements) && userAchievements.some(ach => ach.id === achievementId);
   };
 
   if (isLoading) {
@@ -75,8 +75,8 @@ export default function AchievementsPage() {
         <ol>
           {achievements.map((achievement) => (
             <li
-              key={achievement.achievement_id}
-              className={`shadow-md rounded-lg p-6 mb-4 ${isUserAchievement(achievement.achievement_id) ? 'bg-green-100' : 'bg-white'}`}
+              key={achievement.id}
+              className={`shadow-md rounded-lg p-6 mb-4 ${isUserAchievement(achievement.id) ? 'bg-green-300' : 'bg-white'}`}
             >
               <h2 className="text-xl font-bold mb-2">{achievement.name}</h2>
               <p className="text-gray-700">Opis: {achievement.description}</p>
