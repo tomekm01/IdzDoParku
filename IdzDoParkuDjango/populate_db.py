@@ -1,4 +1,3 @@
-# populate_db.py
 import os
 import django
 from django.contrib.auth.hashers import make_password
@@ -10,43 +9,53 @@ from main.models import Park, POI, Achievement, UserAchievement, User
 
 def populate():
     # Dodaj Park Południowy
-    park_poludniowy = Park.objects.create(
+    park_poludniowy, created = Park.objects.get_or_create(
         park_name="Park Południowy",
-        location="Wrocław, Poland",
-        description="Park Południowy to duży park miejski we Wrocławiu, znany ze swoich pięknych krajobrazów i licznych stawów."
+        defaults={
+            'location': "Wrocław, Poland",
+            'description': "Park Południowy to duży park miejski we Wrocławiu, znany ze swoich pięknych krajobrazów i licznych stawów."
+        }
     )
 
     # Dodaj Taras widokowy nad stawem w Parku Południowym
-    POI.objects.create(
+    POI.objects.get_or_create(
         park=park_poludniowy,
         name="Taras widokowy nad stawem",
-        description="Piękny taras widokowy, skąd można podziwiać staw i otaczającą przyrodę.",
-        latitude=51.0704,
-        longitude=17.0217,
-        qr_code="QR_CODE_LINK",
-        additional_info_link="https://example.com",
-        score_worth=10
+        defaults={
+            'description': "Piękny taras widokowy, skąd można podziwiać staw i otaczającą przyrodę.",
+            'latitude': 51.0704,
+            'longitude': 17.0217,
+            'qr_code': "QR_CODE_LINK",
+            'additional_info_link': "https://example.com",
+            'score_worth': 10
+        }
     )
 
-    first_ach = Achievement.objects.create(
+    first_ach, created = Achievement.objects.get_or_create(
         name="Dobry początek!",
-        description="Gdzieś trzeba zacząć",
-        requirements="Zdobądź pierwszy POI"
+        defaults={
+            'description': "Gdzieś trzeba zacząć",
+            'requirements': "Zdobądź pierwszy POI"
+        }
     )
 
-    Achievement.objects.create(
+    Achievement.objects.get_or_create(
         name="Pięć POI!",
-        description="Dobrze idzie",
-        requirements="Zdobądź 5 POI"
+        defaults={
+            'description': "Dobrze idzie",
+            'requirements': "Zdobądź 5 POI"
+        }
     )
 
-    Agata = User.objects.create(
+    Agata, created = User.objects.get_or_create(
         username="Agata",
-        password_hash=make_password("agataparks"),
-        email="agata@gmail.com"
+        defaults={
+            'password': make_password("agataparks"),
+            'email': "agata@gmail.com"
+        }
     )
 
-    UserAchievement.objects.create(
+    UserAchievement.objects.get_or_create(
         user=Agata,
         achievement=first_ach
     )
