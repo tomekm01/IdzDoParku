@@ -68,9 +68,6 @@ export default function AchievementsPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-6 bg-gray-50">
-      <div className="grid gap-8 lg:grid-cols-2">
-        <h1>Achievements</h1>
-      </div>
       <div>
         <ol>
           {achievements.map((achievement) => (

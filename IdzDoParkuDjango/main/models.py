@@ -17,7 +17,6 @@ class User(models.Model):
     email = models.EmailField()
     registration_date = models.DateField(default=datetime.datetime.now().date())
     score = models.IntegerField(default=0)
-    completed_pois = models.ManyToManyField('POI', through='UserPOI')
 
 class POI(models.Model):
     park = models.ForeignKey(Park, on_delete=models.CASCADE)
@@ -48,8 +47,3 @@ class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     comment_date = models.DateTimeField(auto_now_add=True)
-
-class UserPOI(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    poi = models.ForeignKey(POI, on_delete=models.CASCADE)
-    completion_date = models.DateTimeField(auto_now_add=True)

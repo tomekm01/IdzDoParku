@@ -1,4 +1,5 @@
 # populate_db.py
+import datetime
 import os
 import django
 from django.contrib.auth.hashers import make_password
@@ -6,10 +7,13 @@ from django.contrib.auth.hashers import make_password
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'IdzDoParkuDjango.settings')
 django.setup()
 
-from main.models import Park, POI, Achievement, UserAchievement, User
+from main.models import Park, POI, Achievement, UserAchievement, User, LoginSession, QRScan, Comment
 
 def clear_database():
     # Usuń wszystkie obiekty z modeli
+    Comment.objects.all().delete()
+    QRScan.objects.all().delete()
+    LoginSession.objects.all().delete()
     UserAchievement.objects.all().delete()
     User.objects.all().delete()
     Achievement.objects.all().delete()
@@ -141,7 +145,7 @@ def populate():
         description="Położony nad rzeką rozległy park z terenami trawiastymi i kładkami – malownicze miejsce na spacery."
     )
 
-    POI.objects.create(
+    mala_niagara = POI.objects.create(
         park=park_wschodni,
         name="Mała \"Niagara\"",
         description="Kaskada wodna na wschodnim krańcu parku",
@@ -175,15 +179,21 @@ def populate():
         requirements="Zdobądź 5 POI"
     )
 
-    Agata = User.objects.create(
+    agata = User.objects.create(
         username="Agata",
         password_hash=make_password("agataparks"),
         email="agata@gmail.com",
         score=10
     )
 
+    QRScan.objects.create(
+        poi=mala_niagara,
+        user=agata,
+        scan_date=datetime.datetime.now()
+    )
+
     UserAchievement.objects.create(
-        user=Agata,
+        user=agata,
         achievement=first_ach
     )
 

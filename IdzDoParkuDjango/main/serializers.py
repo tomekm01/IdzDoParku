@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Park, Achievement, User, POI, UserAchievement, LoginSession, QRScan, Comment, UserPOI
+from .models import Park, Achievement, User, POI, UserAchievement, LoginSession, QRScan, Comment
 from django.contrib.auth.hashers import make_password
 
 class ParkSerializer(serializers.ModelSerializer):
@@ -52,8 +52,3 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ['id', 'poi', 'username', 'content', 'comment_date']
         read_only_fields = ['id', 'poi', 'username', 'comment_date']
-
-class UserPOISerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserPOI
-        fields = '__all__'

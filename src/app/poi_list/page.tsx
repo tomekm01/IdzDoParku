@@ -34,13 +34,15 @@ const POIListPage = () => {
   const handleSubmit = (poiId: number) => (event: React.FormEvent) => {
     event.preventDefault();
     const code = qrCodes[poiId] || "";
+    const sessionId = sessionStorage.getItem('session_id');
+    if (!sessionId) return;
     console.log(`Submitting QR code ${code} for POI ${poiId}`);
     fetch(`http://localhost:8000/api/pois/${poiId}/check_qr_code/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ qr_code: code }),
+      body: JSON.stringify({ qr_code: code, session_id: sessionId}),
     })
       .then((response) => response.json())
       .then((data) => {

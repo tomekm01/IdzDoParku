@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, generics
-from .models import Park, Achievement, User, POI, UserAchievement, LoginSession, QRScan, Comment, UserPOI
-from .serializers import ParkSerializer, AchievementSerializer, UserSerializer, POISerializer, UserAchievementSerializer, LoginSessionSerializer, QRScanSerializer, CommentSerializer, UserPOISerializer
+from .models import Park, Achievement, User, POI, UserAchievement, LoginSession, QRScan, Comment
+from .serializers import ParkSerializer, AchievementSerializer, UserSerializer, POISerializer, UserAchievementSerializer, LoginSessionSerializer, QRScanSerializer, CommentSerializer
 from django.contrib.auth import login, logout
 from django.http import JsonResponse
 from django.core.serializers import serialize
@@ -50,10 +50,6 @@ class RegisterUserView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-class UserPOIViewSet(viewsets.ModelViewSet):
-    queryset = UserPOI.objects.all()
-    serializer_class = UserPOISerializer
-
 @csrf_exempt
 def login_view(request):
     if request.method == 'POST':
@@ -70,8 +66,6 @@ def login_view(request):
             return JsonResponse({'message': 'User does not exist'}, status=400)
 
         if check_password(password, user.password_hash):
-            #login(request, user)
-            
             login_session = LoginSession.objects.create(user=user, start_date=datetime.datetime.now())
 
             return JsonResponse({'message': 'Login successful', 'session_id': login_session.id})
@@ -133,15 +127,8 @@ def get_user_achievements_view(request):
         try:
             login_session = LoginSession.objects.get(id=session_id)
             users_ach = UserAchievement.objects.filter(user=login_session.user).select_related('achievement')
-            #users_ach = Achievement.objects.filter(id__in=users_ach_id).values()
             achievements = [ua.achievement for ua in users_ach]
             serialized_achievements = AchievementSerializer(achievements, many=True).data
-            #serialized_ach = serialize("json", users_ach)
-            #serialized_ach = json.loads(serialized_ach)
-            #all_ach = Achievement.objects.values()
-            #data = {}
-            #for e in all_ach:
-            #    if e.id not in users_ach_id:
                     
             return JsonResponse({'message': 'Get user achievements successful', 'serialized_achievements': serialized_achievements})
         except LoginSession.DoesNotExist:
@@ -155,13 +142,6 @@ def get_user_achievements_view(request):
 def get_user_ranking(request):
     if request.method == 'POST':
         try:
-            data = json.loads(request.body)
-            session_id = data.get('session_id')
-        except (json.JSONDecodeError, KeyError):
-            return JsonResponse({'message': 'Invalid JSON data'}, status=400)
-        
-        try:
-            #login_session = LoginSession.objects.get(id=session_id)
             user_ranking = User.objects.all().order_by('-score').values()
             serialized_ranking = UserSerializer(user_ranking, many=True).data
 
@@ -180,6 +160,24 @@ def check_qr_code(request, poi_id):
         qr_code = data.get("qr_code")
         poi = get_object_or_404(POI, id=poi_id)
         if poi.qr_code == qr_code:
+            session_id = data.get('session_id')
+            login_session = LoginSession.objects.get(id=session_id)
+            user = login_session.user
+            scan_date=datetime.datetime.now()
+            QRScan.objects.create(poi=poi, user=user, scan_date=scan_date)
+
+            score_update=poi.score_worth
+            user.score = user.score + score_update
+            user.save()
+
+            user_poi_count = QRScan.objects.filter(user=user).count()
+            if user_poi_count == 1:
+                achievement1 = Achievement.objects.get(name="Dobry początek!")
+                UserAchievement.objects.create(user=user, achievement=achievement1)
+            elif user_poi_count == 5: 
+                achievement2 = Achievement.objects.get(name="Pięć POI!")
+                UserAchievement.objects.create(user=user, achievement=achievement2)
+
             return JsonResponse({"valid": True})
         return JsonResponse({"valid": False})
     

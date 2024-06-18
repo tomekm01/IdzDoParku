@@ -60,9 +60,6 @@ export default function RankingPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-6 bg-gray-50">
-      <div className="grid gap-8 lg:grid-cols-2">
-        <h1>Ranking</h1>
-      </div>
       {currentUser && (
         <div className="mb-6 p-4 bg-blue-100 rounded-lg shadow-md">
           <h2 className="text-xl font-bold mb-2">{currentUser[1]} - {currentUser[2]}</h2>
@@ -70,12 +67,12 @@ export default function RankingPage() {
       )}
       <div>
         <ol>
-          {users.map((user) => (
+          {users.map((user, position) => (
             <li
               key={user.id}
               className={`shadow-md rounded-lg p-6 mb-4 ${user.id === currentUser[0] ? 'bg-green-300' : 'bg-white'}`}
             >
-              <h2 className="text-xl font-bold mb-2">{user.username} - {user.score}</h2>
+              <h2 className="text-xl font-bold mb-2">{position + 1}. {user.username} {user.score}</h2>
             </li>
           ))}
         </ol>
