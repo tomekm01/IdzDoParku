@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Park, Achievement, User, POI, UserAchievement, LoginSession, QRScan, Comment
+from .models import Park, Achievement, User, POI, UserAchievement, LoginSession, QRScan, Comment, UserPOI
 from django.contrib.auth.hashers import make_password
 
 class ParkSerializer(serializers.ModelSerializer):
@@ -45,7 +45,15 @@ class QRScanSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class CommentSerializer(serializers.ModelSerializer):
+    username = serializers.ReadOnlyField(source='user.username')
+    comment_date = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', read_only=True)
+
     class Meta:
         model = Comment
-        fields = ['id', 'poi', 'user', 'content', 'comment_date']
-        read_only_fields = ['id', 'poi', 'user', 'comment_date']
+        fields = ['id', 'poi', 'username', 'content', 'comment_date']
+        read_only_fields = ['id', 'poi', 'username', 'comment_date']
+
+class UserPOISerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserPOI
+        fields = '__all__'

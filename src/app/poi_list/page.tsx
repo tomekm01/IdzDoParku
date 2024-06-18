@@ -1,16 +1,17 @@
 "use client";
-
 import React, { useEffect, useState } from "react";
 import { POI, Comment } from "../types/interfaces";
 
 const POIListPage = () => {
   const [pois, setPois] = useState<POI[]>([]);
-  const [code, setCode] = useState("");
+  const [qrCodes, setQrCodes] = useState<{ [key: number]: string }>({});
   const [currentPOI, setCurrentPOI] = useState<number | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
-  const [newComment, setNewComment] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [invalidCode, setInvalidCode] = useState<boolean>(false);
+  const [invalidCodes, setInvalidCodes] = useState<{ [key: number]: boolean }>(
+    {}
+  );
+  const [newComment, setNewComment] = useState<string>("");
 
   useEffect(() => {
     fetch("http://localhost:8000/api/pois/")
@@ -22,12 +23,17 @@ const POIListPage = () => {
       });
   }, []);
 
-  const handleCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCode(event.target.value);
-  };
+  const handleCodeChange =
+    (poiId: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      setQrCodes({
+        ...qrCodes,
+        [poiId]: event.target.value,
+      });
+    };
 
   const handleSubmit = (poiId: number) => (event: React.FormEvent) => {
     event.preventDefault();
+    const code = qrCodes[poiId] || "";
     console.log(`Submitting QR code ${code} for POI ${poiId}`);
     fetch(`http://localhost:8000/api/pois/${poiId}/check_qr_code/`, {
       method: "POST",
@@ -42,11 +48,11 @@ const POIListPage = () => {
         if (data.valid) {
           setCurrentPOI(poiId);
           fetchComments(poiId);
-          setInvalidCode(false);
+          setInvalidCodes({ ...invalidCodes, [poiId]: false });
         } else {
           setCurrentPOI(null);
           setComments([]);
-          setInvalidCode(true);
+          setInvalidCodes({ ...invalidCodes, [poiId]: true });
         }
       })
       .catch((error) => {
@@ -73,6 +79,7 @@ const POIListPage = () => {
 
   const handleAddComment = (poiId: number) => (event: React.FormEvent) => {
     event.preventDefault();
+    const sessionId = sessionStorage.getItem("session_id");
     console.log(`Adding comment to POI ${poiId}`);
 
     fetch(`http://localhost:8000/api/pois/${poiId}/add_comment/`, {
@@ -80,7 +87,10 @@ const POIListPage = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ content: newComment }),
+      body: JSON.stringify({
+        content: newComment,
+        session_id: sessionId,
+      }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -118,8 +128,8 @@ const POIListPage = () => {
                 <div className="flex items-center border-b-2 border-green-500 py-2">
                   <input
                     type="text"
-                    value={code}
-                    onChange={handleCodeChange}
+                    value={qrCodes[poi.id] || ""}
+                    onChange={handleCodeChange(poi.id)}
                     placeholder="Wpisz kod zaliczenia POI"
                     className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none"
                   />
@@ -131,15 +141,26 @@ const POIListPage = () => {
                   </button>
                 </div>
               </form>
-              {invalidCode && <p className="text-red-500">Błędny kod</p>}
+              {invalidCodes[poi.id] && (
+                <p className="text-red-500">Błędny kod</p>
+              )}
               {currentPOI === poi.id && (
                 <div className="bg-white shadow-md rounded-lg p-6 mt-4 w-full max-w-lg">
                   <h2>Komentarze</h2>
                   {comments.length > 0 ? (
                     comments.map((comment) => (
-                      <p key={comment.id} className="text-gray-700">
-                        {comment.content}
-                      </p>
+                      <div
+                        key={comment.id}
+                        className="border-b border-gray-200 py-4"
+                      >
+                        <p className="text-gray-700 font-semibold">
+                          {comment.username}
+                        </p>
+                        <p className="text-gray-500 text-sm">
+                          {new Date(comment.comment_date).toLocaleString()}
+                        </p>
+                        <p className="text-gray-700">{comment.content}</p>
+                      </div>
                     ))
                   ) : (
                     <p>Brak komentarzy</p>

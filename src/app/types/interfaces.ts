@@ -59,6 +59,7 @@ export interface Comment {
   id: number;
   poi_id: number;
   user_id: number;
+  username: string;
   content: string;
   comment_date: Date;
 }

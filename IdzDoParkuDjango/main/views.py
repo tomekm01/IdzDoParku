@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, generics
-from .models import Park, Achievement, User, POI, UserAchievement, LoginSession, QRScan, Comment
-from .serializers import ParkSerializer, AchievementSerializer, UserSerializer, POISerializer, UserAchievementSerializer, LoginSessionSerializer, QRScanSerializer, CommentSerializer
+from .models import Park, Achievement, User, POI, UserAchievement, LoginSession, QRScan, Comment, UserPOI
+from .serializers import ParkSerializer, AchievementSerializer, UserSerializer, POISerializer, UserAchievementSerializer, LoginSessionSerializer, QRScanSerializer, CommentSerializer, UserPOISerializer
 from django.contrib.auth import login, logout
 from django.http import JsonResponse
 from django.core.serializers import serialize
@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
 #from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework import status
 import json
 
 class ParkViewSet(viewsets.ModelViewSet):
@@ -48,6 +49,10 @@ class CommentViewSet(viewsets.ModelViewSet):
 class RegisterUserView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+class UserPOIViewSet(viewsets.ModelViewSet):
+    queryset = UserPOI.objects.all()
+    serializer_class = UserPOISerializer
 
 @csrf_exempt
 def login_view(request):
@@ -179,20 +184,52 @@ def check_qr_code(request, poi_id):
         return JsonResponse({"valid": False})
     
 def get_comments(request, poi_id):
-    comments = Comment.objects.filter(poi_id=poi_id).values()
-    return JsonResponse(list(comments), safe=False)
+    comments = Comment.objects.filter(poi_id=poi_id)
+    serialized_comments = CommentSerializer(comments, many=True).data
+    return JsonResponse(serialized_comments, safe=False)
 
 
 #@permission_classes([IsAuthenticated])
 @api_view(['POST'])
 def add_comment(request, poi_id):
     try:
-        poi = POI.objects.get(id=poi_id)
-    except POI.DoesNotExist:
-        return Response({'error': 'POI not found'}, status=404)
-    
-    serializer = CommentSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save(poi=poi, user=request.user)
-        return Response(serializer.data, status=201)
-    return Response(serializer.errors, status=400)
+        data = request.data
+        session_id = data.get('session_id')
+        if not session_id:
+            return Response({'error': 'session_id is required'}, status=400)
+
+        # Find the login session
+        try:
+            login_session = LoginSession.objects.get(id=session_id, end_date__isnull=True)
+            user = login_session.user
+        except LoginSession.DoesNotExist:
+            return Response({'error': 'Invalid session ID'}, status=404)
+
+        # Find the POI
+        try:
+            poi = POI.objects.get(id=poi_id)
+        except POI.DoesNotExist:
+            return Response({'error': 'POI not found'}, status=404)
+
+        # Create and save the comment
+        serializer = CommentSerializer(data=data)
+        if serializer.is_valid():
+            # Log przed zapisem
+            print(f"Creating comment for POI ID {poi_id} by user {user.username}")
+
+            # Zapis komentarza
+            serializer.save(poi=poi, user=user, comment_date=datetime.datetime.now())
+
+            # Log po zapisie
+            print("Comment created successfully")
+            
+            return Response(serializer.data, status=201)
+        else:
+            # Log błędów walidacji
+            print("Validation errors:", serializer.errors)
+
+            return Response(serializer.errors, status=400)
+    except Exception as e:
+        # Log ogólnego wyjątku
+        print("Exception:", str(e))
+        return Response({'error': str(e)}, status=500)
