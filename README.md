@@ -1,7 +1,33 @@
 Aplikacja webowa typu "zbierz je wszystkie" dotycząca punktów zainteresowań we wrocławskich parkach. 
+
 https://idz-do-parku.vercel.app
 
+Projekt składa się z backendu opartego na Python Django (w folderze IdzDoParkuDjango), oraz frontendu Next.js (folder src, public oraz pozostałe pliki).
+#########################################################################################################
+Jak uruchomić?
 
+1. Należy zainstalować postgreSQL, utworzyć użytkownika "postgres" z hasłem "parks" oraz utworzyć pustą bazę danych o nazwie Parks.
+(w przypadku innej konfiguracji użytkownika należy zmienić dane w settings.py w IdzDoParku/IdzDoParkuDjango/IdzDoParkuDjango)
+
+2. Należy zainstalować potrzebne pakiety:
+  - npm install
+  - pip install django djangorestframework
+  - pip install django-cors-headers
+  - pip install psycopg2
+
+3. Należy zapełnić bazę danych danymi:
+   - Najpierw w folderze IdzDoParku/IdzDoParkuDjango utworzyć migracje do bazy:
+       - python manage.py makemigrations
+       - python manage.py migrate  
+   - Następnie do gotowej bazy danych można wysłać przykładowe dane:
+       - python populate_db.py
+    
+4. Teraz wystarczy uruchomić aplikację:
+     - w folderze IdzDoParku/IdzDoParkuDjango python manage.py runserver (uruchamiamy backend)
+     - równocześcnie na drugim terminalu w folderze IdzDoParku npm run dev (uruchamiamy frontend)
+     - pod adresem http://localhost:3000 powinna być uruchomiona sprawna aplikacja, można zalogować się na przykładowe konto (login Agata, hasło agataparks)
+       
+#########################################################################################################
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
