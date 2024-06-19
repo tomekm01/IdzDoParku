@@ -10,21 +10,34 @@ Jak uruchomić?
 (w przypadku innej konfiguracji użytkownika należy zmienić dane w settings.py w IdzDoParku/IdzDoParkuDjango/IdzDoParkuDjango)
 
 2. Należy zainstalować potrzebne pakiety:
-  - npm install
-  - pip install django djangorestframework
-  - pip install django-cors-headers
-  - pip install psycopg2
-
+```bash
+npm install
+pip install django djangorestframework
+pip install django-cors-headers
+pip install psycopg2
+```
 3. Należy zapełnić bazę danych danymi:
    - Najpierw w folderze IdzDoParku/IdzDoParkuDjango utworzyć migracje do bazy:
-       - python manage.py makemigrations
-       - python manage.py migrate  
+      ```bash
+      python manage.py makemigrations
+      python manage.py migrate
+      ```
    - Następnie do gotowej bazy danych można wysłać przykładowe dane:
-       - python populate_db.py
+      ```bash
+      python populate_db.py
+      ```
     
 4. Teraz wystarczy uruchomić aplikację:
-     - w folderze IdzDoParku/IdzDoParkuDjango python manage.py runserver (uruchamiamy backend)
-     - równocześcnie na drugim terminalu w folderze IdzDoParku npm run dev (uruchamiamy frontend)
+     - w folderze IdzDoParku/IdzDoParkuDjango
+      ```bash
+      # uruchamiamy backend
+      python manage.py runserver
+      ```
+     - równocześcnie na drugim terminalu w folderze IdzDoParku
+      ```bash
+      # uruchamiamy frontend
+      npm run dev
+      ```
      - pod adresem http://localhost:3000 powinna być uruchomiona sprawna aplikacja, można zalogować się na przykładowe konto (login Agata, hasło agataparks)
        
 #########################################################################################################
